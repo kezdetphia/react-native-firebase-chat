@@ -39,8 +39,9 @@ const ChatRoom = () => {
   const { user } = useAuth(); //currently logged in user
   const router = useRouter();
   const [messages, setMessages] = useState([]);
-  const textRef = useRef();
-  const inputRef = useRef();
+  const textRef = useRef("");
+  const inputRef = useRef(null);
+  const scrollViewRef = useRef(null);
 
   useEffect(() => {
     createRoomIfNotExists();
@@ -58,6 +59,16 @@ const ChatRoom = () => {
     });
     return unsub;
   }, []);
+
+  useEffect(() => {
+    updateScrollView();
+  }, [messages]);
+
+  const updateScrollView = () => {
+    setTimeout(() => {
+      scrollViewRef.current?.scrollToEnd({ animated: true });
+    }, 100);
+  };
 
   const createRoomIfNotExists = async () => {
     //roomId
@@ -96,38 +107,42 @@ const ChatRoom = () => {
     <View className="flex-1 bg-white">
       <StatusBar style="dark" />
       <ChatRoomHeader user={item} router={router} />
+      {/* <KeyboardAwareScrollView extraScrollHeight={150}> */}
       <View className="h-3 border-b border-neutral-300" />
       <View className="flex-1 justify-between bg-neutral-100 overflow-visible">
-        <KeyboardAwareScrollView extraScrollHeight={150}>
-          <View className="flex-1">
-            <MessageList messages={messages} currentUser={user} />
-          </View>
-        </KeyboardAwareScrollView>
+        <View className="flex-1">
+          <MessageList
+            scrollViewRef={scrollViewRef}
+            messages={messages}
+            currentUser={user}
+          />
+        </View>
       </View>
-      <KeyboardAvoidingView
+      {/* <KeyboardAvoidingView
         behavior="padding"
         keyboardVerticalOffset={Platform.OS === "ios" ? 100 : 0}
-      >
-        <SafeAreaView>
-          <View style={{ marginBottom: hp(1) }} className="pt-2">
-            <View className=" flex-row mx-3 justify-between bg-white border p-2 border-neutral-300 rounded-full pl-5">
-              <TextInput
-                ref={inputRef}
-                onChangeText={(value) => (textRef.current = value)}
-                style={{ fontSize: hp(2) }}
-                placeholder="Type message..."
-                className="flex-1 mr-2  "
-              />
-              <TouchableOpacity
-                onPress={handleSendMessage}
-                className="bg-neutral-200 p-2 mr-[1px] rounded-full "
-              >
-                <Feather name="send" size={hp(2.7)} color="#737373" />
-              </TouchableOpacity>
-            </View>
+      > */}
+      {/* </KeyboardAwareScrollView> */}
+      <SafeAreaView>
+        <View style={{ marginBottom: hp(1) }} className="pt-2">
+          <View className=" flex-row mx-3 justify-between bg-white border p-2 border-neutral-300 rounded-full pl-5">
+            <TextInput
+              ref={inputRef}
+              onChangeText={(value) => (textRef.current = value)}
+              style={{ fontSize: hp(2) }}
+              placeholder="Type message..."
+              className="flex-1 mr-2  "
+            />
+            <TouchableOpacity
+              onPress={handleSendMessage}
+              className="bg-neutral-200 p-2 mr-[1px] rounded-full "
+            >
+              <Feather name="send" size={hp(2.7)} color="#737373" />
+            </TouchableOpacity>
           </View>
-        </SafeAreaView>
-      </KeyboardAvoidingView>
+        </View>
+      </SafeAreaView>
+      {/* </KeyboardAvoidingView> */}
     </View>
   );
 };
